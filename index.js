@@ -7,8 +7,10 @@ const cheerio = require('cheerio')
 
 const app = express()
 
+const targetUrl = 'http://m.zgmht.com/company-26.html'
+
 app.get('/', (req, res) => {
-    superagent.get('http://m.zgmht.com/company.html')
+    superagent.get(targetUrl)
         .charset('gbk')
         .end((err, sres) => {
 
@@ -18,20 +20,18 @@ app.get('/', (req, res) => {
             const $ = cheerio.load(sres.text, {
                 decodeEntities: false
             })
-            let items = []
+
+            let str = ''
 
             $('#moreList li').each(function (idx, element) {
                 const $tit1 = $('#moreList li .tit1').eq(idx);
                 const $contact_person = $('#moreList li .contact_person').eq(idx);
                 const $tel = $('#moreList li .tel').eq(idx);
-                items.push({
-                    cName: $tit1.text(),
-                    name: $contact_person.text(),
-                    tel: $tel.text()
-                })
+
+                str += `${idx + 1}. ${$tit1.text()} - ${$contact_person.text()} - ${$tel.text()}<br/>`
             })
 
-            res.send(items)
+            res.send(str)
         })
 })
 
